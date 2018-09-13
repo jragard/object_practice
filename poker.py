@@ -42,230 +42,30 @@ class PokerHand(object):
                 hand_dict[card[0]].append(card[1])
   
         return (hand_dict, final_hand)
-      
-    def winner_result(self, hand_score, other_score):
+
+    
+    def first_tiebreak_check(self, hand_score, other_score):
+        if hand_score['score'] == 1 or hand_score['score'] == 5 or hand_score['score'] == 6 or hand_score['score'] == 9:
+            length = 1
+        elif hand_score['score'] == 2 or hand_score['score'] == 3:
+            length = 2
+        elif hand_score['score'] == 4:
+            length = 3
+        elif hand_score['score'] == 7:
+            length = 3
+        elif hand_score['score'] == 8:
+            length = 4
         
-        # Basic score check 
-        if hand_score['score'] > other_score['score']:
-            result = 'Win'
-        elif hand_score['score'] < other_score['score']:
-            result = 'Loss'
-          
-        # The following elif statements check for various different tie cases where players have the same hand
-        
-        # Checks tie case where both players have three of a kind
-        elif hand_score['score'] == 4  and other_score['score'] == 4:
-            for key in hand_score['player_dict']:
-                if len(hand_score['player_dict'][key]) == 3:
-                    hand_tiebreaker = key
-            for key in other_score['other_dict']:
-                if len(other_score['other_dict'][key]) == 3:
-                    other_tiebreaker = key
-            if int(hand_tiebreaker) > int(other_tiebreaker):
-                result = 'Win'
-            elif int(hand_tiebreaker) < int(other_tiebreaker):
-                result = 'Loss'
-            else:
-                player_tiebreak_list = []
-                other_tiebreak_list = []
-            
-            for card in sorted(hand_score['hand_data'], key=lambda x: int(x[0]), reverse=True):
-                player_tiebreak_list.append(card[0])
-            for card in sorted(other_score['hand_data'], key=lambda x: int(x[0]), reverse=True):
-                other_tiebreak_list.append(card[0])
-          
-            if player_tiebreak_list == other_tiebreak_list:
-                result = 'Tie'
-            else:
-                for index, num in enumerate(player_tiebreak_list):
-                    if int(num) == int(other_tiebreak_list[index]):
-                        pass
-                    elif int(num) > int(other_tiebreak_list[index]):
-                        result = 'Win'
-                        break
-                    elif int(num) < int(other_tiebreak_list[index]):
-                        result = 'Loss'
-                        break
-              
-        # Checks tie cases where both players have high card    
-        elif hand_score['score'] == 1 and other_score['score'] == 1:
-            player_tiebreak_list = []
-            other_tiebreak_list = []
-            for card in sorted(hand_score['hand_data'], key=lambda x: int(x[0]), reverse=True):
-                player_tiebreak_list.append(card[0])
-            for card in sorted(other_score['hand_data'], key=lambda x: int(x[0]), reverse=True):
-                other_tiebreak_list.append(card[0])
+
          
-            if player_tiebreak_list == other_tiebreak_list:
-                result = 'Tie'
-            else:
-                for index, num in enumerate(player_tiebreak_list):
-                    if int(num) == int(other_tiebreak_list[index]):
-                        pass
-                    elif int(num) > int(other_tiebreak_list[index]):
-                        result = 'Win'
-                        break
-                    elif int(num) < int(other_tiebreak_list[index]):
-                        result = 'Loss'
-                        break
-              
-        # Checks tie cases where both players have a flush
-        elif hand_score['score'] == 6 and other_score['score'] == 6:
-            if int(hand_score['high_card']) > int(other_score['high_card']):
-                result = 'Win'
-            elif int(hand_score['high_card']) < int(other_score['high_card']):
-                result = 'Loss'
-            else:
-                player_tiebreak_list = []
-                other_tiebreak_list = []
-                for card in sorted(hand_score['hand_data'], key=lambda x: int(x[0]), reverse=True):
-                    if card[0] == hand_score['high_card']:
-                        pass
-                    else:
-                        player_tiebreak_list.append(card[0])
-                for card in sorted(other_score['hand_data'], key=lambda x: int(x[0]), reverse=True):
-                    if card[0] == other_score['high_card']:
-                        pass
-                    else:
-                        other_tiebreak_list.append(card[0])
-            
-                if player_tiebreak_list == other_tiebreak_list:
-                    result = "Tie"
-                else:
-                    for index, number in enumerate(player_tiebreak_list):
-                        if int(number) == int(other_tiebreak_list[index]):
-                            pass
-                        elif int(number) > int(other_tiebreak_list[index]):
-                            result = 'Win'
-                            break
-                        elif int(number) < int(other_tiebreak_list[index]):
-                            result = 'Loss'
-                            break  
-            
-        
-            
-        # Checks tie cases where both players have a straight or straight flush.  In these
-        # cases we can simply break the tie by finding the high card 
-        elif hand_score['score'] == 5 and other_score['score'] == 5 or hand_score['score'] == 9 and other_score['score'] == 9:
-            if int(hand_score['high_card']) > int(other_score['high_card']):
-                result = 'Win'
-            elif int(hand_score['high_card']) < int(other_score['high_card']):
-                result = 'Loss'
-            else:
-                result = 'Tie'
-        
-        # Checks tie case where both players have royal flush
-        elif hand_score['score'] == 10 and other_score['score'] == 10:
-            result = 'Tie'
-        
-        # Checks tie case where both players have four of a kind
-        elif hand_score['score'] == 8 and other_score['score'] == 8:
-            for key in hand_score['player_dict']:
-                if len(hand_score['player_dict'][key]) == 4:
-                    hand_tiebreaker = key
-                else:
-                    hand_high_card = key
-            for key in other_score['other_dict']:
-                if len(other_score['other_dict'][key]) == 4:
-                    other_tiebreaker = key
-                else:
-                    other_high_card = key
-            if int(hand_tiebreaker) > int(other_tiebreaker):
-                result = 'Win'
-            elif int(hand_tiebreaker) < int(other_tiebreaker):
-                result = 'Loss'
-            else:
-                if hand_high_card == other_high_card:
-                    result = 'Tie'
-                elif int(hand_high_card) > int(other_high_card):
-                    result = 'Win'
-                elif int(hand_high_card) < int(other_high_card):
-                    result = 'Loss'
-            
-        # Checks tie case where both players have full house
-        elif hand_score['score'] == 7 and other_score['score'] == 7:
-            for key in hand_score['player_dict']:
-                if len(hand_score['player_dict'][key]) == 3:
-                    hand_tiebreaker = key
-                else:
-                    player_house_pair = key
-            for key in other_score['other_dict']:
-                if len(other_score['other_dict'][key]) == 3:
-                    other_tiebreaker = key
-                else: 
-                    other_house_pair = key
-            if int(hand_tiebreaker) > int(other_tiebreaker):
-                result = 'Win'
-            elif int(hand_tiebreaker) < int(other_tiebreaker):
-                result = 'Loss'
-            else:
-                if player_house_pair == other_house_pair:
-                    result = "Tie"
-                elif int(player_house_pair) > int(other_house_pair):
-                    result = "Win"
-                elif int(player_house_pair) < int(other_house_pair):
-                    result = "Loss"
-            
-        # Checks tie case where both players have 1 pair  
-        elif hand_score['score'] == 2 and other_score['score'] == 2:
-            for key in hand_score['player_dict']:
-                if len(hand_score['player_dict'][key]) == 2:
-                    hand_tiebreaker = key
-            for key in other_score['other_dict']:
-                if len(other_score['other_dict'][key]) == 2:
-                    other_tiebreaker = key
-              
-            if int(hand_tiebreaker) > int(other_tiebreaker):
-                result = 'Win'
-            elif int(hand_tiebreaker) < int(other_tiebreaker):
-                result = 'Loss'
-            else:
-                player_tiebreak_list = []
-                other_tiebreak_list = []
-                for card in sorted(hand_score['hand_data'], key=lambda x: int(x[0]), reverse=True):
-                    if card[0] == hand_tiebreaker:
-                        pass
-                    else:
-                        player_tiebreak_list.append(card[0])
-                for card in sorted(other_score['hand_data'], key=lambda x: int(x[0]), reverse=True):
-                    if card[0] == other_tiebreaker:
-                        pass
-                    else:
-                        other_tiebreak_list.append(card[0])
-            
-                if player_tiebreak_list == other_tiebreak_list:
-                    result = "Tie"
-                else:
-                    for index, number in enumerate(player_tiebreak_list):
-                        if int(number) == int(other_tiebreak_list[index]):
-                            pass
-                        elif int(number) > int(other_tiebreak_list[index]):
-                            result = 'Win'
-                            break
-                        elif int(number) < int(other_tiebreak_list[index]):
-                            result = 'Loss'
-                            break
-            
-            
-            
-        # Checks tie case where both players have two pair
-        elif hand_score['score'] == 3 and other_score['score'] == 3:
-            hand_tiebreaker = []
-            other_tiebreaker = []
-            for key in hand_score['player_dict']:
-                if len(hand_score['player_dict'][key]) == 2:
-                    hand_tiebreaker.append(key)
-                else:
-                    player_fifth_card = key
-            for key in other_score['other_dict']:
-                if len(other_score['other_dict'][key]) == 2:
-                    other_tiebreaker.append(key)
-                else:
-                    other_fifth_card = key
-              
-            h_tie_sort = sorted(hand_tiebreaker, key=lambda(x):int(x))
-            o_tie_sort = sorted(other_tiebreaker, key=lambda(x):int(x))
-  
+        hand_tiebreaker = [key for key in hand_score['player_dict'] if len(hand_score['player_dict'][key]) == length]
+        other_tiebreaker = [key for key in other_score['other_dict'] if len(other_score['other_dict'][key]) == length]
+
+        if hand_score['score'] == 3 and other_score['score'] == 3:
+            player_fifth_card = [key for key in hand_Score['player_dict'] if len(hand_score['player_dict'][key]) != length]
+            h_tie_sort = sorted(hand_tiebreaker, key=lambda x:int(x))
+            o_tie_sort = sorted(other_tiebreaker, key=lambda x:int(x))
+
             if int(h_tie_sort[1]) > int(o_tie_sort[1]):
                 result = 'Win'
             elif int(h_tie_sort[1]) < int(o_tie_sort[1]):
@@ -277,7 +77,54 @@ class PokerHand(object):
                     result = 'Win'
                 elif int(player_fifth_card) < int(other_fifth_card):
                     result = 'Loss'
-           
+
+        # print 'hand tiebreaker', hand_tiebreaker
+        for index, num in enumerate(hand_tiebreaker):
+            if int(num) > int(other_tiebreaker[index]):
+                result = 'Win'
+                break
+            elif int(num) < int(other_tiebreaker[index]):
+                result = 'Loss'
+                break
+            else:
+                player_tiebreak_list = [card[0] for card in sorted(hand_score['hand_data'], key=lambda x: int(x[0]), reverse=True) if card[0] != hand_tiebreaker]
+                other_tiebreak_list = [card[0] for card in sorted(other_score['hand_data'], key=lambda x: int(x[0]), reverse=True) if card[0] != other_tiebreaker]
+                result = self.tiebreak_edge_case(player_tiebreak_list, other_tiebreak_list)
+                break
+        return result
+
+    
+    def tiebreak_edge_case(self, player_tiebreak_list, other_tiebreak_list):
+        if player_tiebreak_list == other_tiebreak_list:
+            result = 'Tie'
+        else:
+            for index, num in enumerate(player_tiebreak_list):
+                if int(num) == int(other_tiebreak_list[index]):
+                    pass
+                elif int(num) > int(other_tiebreak_list[index]):
+                    result = 'Win'
+                    break
+                elif int(num) < int(other_tiebreak_list[index]):
+                    result = 'Loss'
+                    break
+
+        return result
+
+
+    def winner_result(self, hand_score, other_score):
+        print 'hand_score', hand_score
+        print 'other_score', other_score
+
+        # Basic score check 
+        if hand_score['score'] > other_score['score']:
+            result = 'Win'
+        elif hand_score['score'] < other_score['score']:
+            result = 'Loss'
+        elif hand_score['score'] == 10 and other_score['score'] == 10:
+            result = 'Tie'
+        else:
+            result = self.first_tiebreak_check(hand_score, other_score)
+        
         return result
       
     def compare_with(self, other):
@@ -437,3 +284,19 @@ class PokerHand(object):
                            }
       
         return self.winner_result(player_score_dict, other_score_dict)
+
+
+player = PokerHand("4C 5C 9C 8C KC")
+other = PokerHand("3S 8S 9S 5S KS")
+print player.compare_with(other)
+
+# 1 - high card
+# 2 - pair
+# 3 - 2 pair
+# 4 - 3 of kind
+# 5 - straight
+# 6 - flush
+# 7 - full house
+# 8 - four of kind
+# 9 - straight flush
+# 10 - royal flush
